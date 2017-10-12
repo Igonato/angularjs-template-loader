@@ -5,8 +5,8 @@ const path = require("path");
 const templateUrlRegex = /templateUrl\s*:(\s*['"`](.*?)['"`]\s*([,}]))/gm;
 const stringRegex = /(['`"])((?:[^\\]\\\1|.)*?)\1/g;
 
-function replaceStringsWithRequires(string, relativeTo) {
-  return string.replace(stringRegex, (match, quote, url) => {
+function replaceStringsWithRequires(string, relativeTo, getRequire) {
+  return string.replace(stringRegex, getRequire || (match, quote, url) => {
     if (relativeTo) {
       url = path.posix.join(relativeTo, url);
     }
@@ -28,7 +28,9 @@ module.exports = function(source, sourcemap) {
     // with: template: require('./path/to/template.html')
     // or: template: require('/root/app/path/template.html')
     // if `relativeTo` option is set to /root/app.
-    return "template:" + replaceStringsWithRequires(url, options && options.relativeTo);
+    return "template:" + replaceStringsWithRequires(
+      url, options.relativeTo, options.getRequire
+    );
   });
 
   // Support for tests
