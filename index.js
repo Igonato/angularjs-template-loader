@@ -6,7 +6,7 @@ const templateUrlRegex = /templateUrl\s*:(\s*['"`](.*?)['"`]\s*([,}]))/gm;
 const stringRegex = /(['`"])((?:[^\\]\\\1|.)*?)\1/g;
 
 function replaceStringsWithRequires(string, relativeTo, getRequire) {
-  return string.replace(stringRegex, getRequire || (match, quote, url) => {
+  return string.replace(stringRegex, getRequire || ((match, quote, url) => {
     if (relativeTo) {
       url = path.posix.join(relativeTo, url);
     }
@@ -14,7 +14,7 @@ function replaceStringsWithRequires(string, relativeTo, getRequire) {
       url = "./" + url;
     }
     return "require('" + url + "')";
-  });
+  }));
 }
 
 module.exports = function(source, sourcemap) {
